@@ -124,9 +124,14 @@ void setup() {
     sendHW(deep_sleep_cycle);
 
     // ========== Send Sensor Data (Hourly) ==========
-    // Accumulates 4 cycles (4 * 15min = 60min), then sends sensor data
-    if (hourly_cycle_count >= CYCLES_PER_HOUR) {
-        Serial.println("[CYCLE] Hourly sensor send");
+    // Send once immediately after first power-on boot, then every hour thereafter.
+    bool firstBootAfterPowerOn = (deep_sleep_cycle == 1);
+    if (firstBootAfterPowerOn || hourly_cycle_count >= CYCLES_PER_HOUR) {
+        if (firstBootAfterPowerOn) {
+            Serial.println("[CYCLE] First-boot sensor send");
+        } else {
+            Serial.println("[CYCLE] Hourly sensor send");
+        }
         sendSensor(hourly_cycle_count);
         hourly_cycle_count = 0;
     }
